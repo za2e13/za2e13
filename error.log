@@ -1,0 +1,8 @@
+[16-Nov-2015 13:25:37 UTC] HTTP 404 (GET /favicon.ico)
+[16-Nov-2015 13:25:37 UTC] - index.php:37 Base->run()
+[04-Dec-2015 15:12:03 UTC] HTTP 404 (GET /favicon.ico)
+[04-Dec-2015 15:12:03 UTC] - index.php:37 Base->run()
+[04-Dec-2015 15:16:32 UTC] HTTP 404 (GET /favicon.ico)
+[04-Dec-2015 15:16:32 UTC] - index.php:37 Base->run()
+[04-Dec-2015 16:11:05 UTC] HTTP 404 (GET /favicon.ico)
+[04-Dec-2015 16:11:05 UTC] - index.php:37 Base->run()
