@@ -19,6 +19,7 @@ class Blog extends Controller {
 
 	public function view($f3) {
 		$id = $f3->get('PARAMS.3');
+		$id= (integer)$id;
 		if(empty($id)) {
 			return $f3->reroute('/');
 		}
@@ -38,6 +39,14 @@ class Blog extends Controller {
 	}
 
 	public function reset($f3) {
+		
+		// check user access 
+		$access = $this->Auth->user("level");
+		
+		if($access<2){
+			StatusMessage::add('Rejected', 'danger');
+			return $f3->reroute('/');
+		}
 		$allposts = $this->Model->Posts->fetchAll();
 		$allcategories = $this->Model->Categories->fetchAll();
 		$allcomments = $this->Model->Comments->fetchAll();

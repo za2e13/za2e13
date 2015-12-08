@@ -5,7 +5,7 @@ class User extends Controller {
 		$userid = $f3->get('PARAMS.3');
 		
 		// Provent SQL Injection by filtering data
-		$userid = (integer)=$userid;
+		$userid = (integer)$userid;
 		$u = $this->Model->Users->fetch($userid);
 
 		$articles = $this->Model->Posts->fetchAll(array('user_id' => $userid));
@@ -142,6 +142,7 @@ class User extends Controller {
 		$f3->set('u',$u);
 	}
 
+	// application logic disabled this function
 	public function promote($f3) {
 		$id = $this->Auth->user('id');
 		$u = $this->Model->Users->fetch($id);

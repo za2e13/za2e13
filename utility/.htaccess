@@ -1,0 +1,4 @@
+# Enable rewrite engine and route requests to framework
+RewriteEngine On
+
+deny from all
