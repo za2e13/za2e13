@@ -7,7 +7,8 @@ class Contact extends Controller {
 			extract($this->request->data);
 			$from = "From: $from";
 
-			mail($to,$subject,$message,$from);
+			// email address update 
+			mail("root@localhost",$subject,$message,$from);
 
 			StatusMessage::add('Thank you for contacting us');
 			return $f3->reroute('/');

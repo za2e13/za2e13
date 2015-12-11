@@ -7,6 +7,10 @@ class User extends Controller {
 		// Provent SQL Injection by filtering data
 		$userid = (integer)$userid;
 		$u = $this->Model->Users->fetch($userid);
+		if(empty($u)){
+                \StatusMessage::add('Invalid post name','danger');
+                return $f3->reroute('/admin/category');
+            }
 
 		$articles = $this->Model->Posts->fetchAll(array('user_id' => $userid));
 		$comments = $this->Model->Comments->fetchAll(array('user_id' => $userid));
@@ -18,6 +22,22 @@ class User extends Controller {
 
 	public function add($f3) {
 		if($this->request->is('post')) {
+$settings = $this->Model->Settings;
+            $debug = $settings->getSetting('debug');
+
+            if ($debug != 1) {                    
+                $captcha=$_POST['g-recaptcha-response'];
+                if(empty($captcha)) { 
+                    StatusMessage::add('Enter captcha please','danger');
+                    $f3->reroute('/');
+                }
+                $response=file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=6Ld6wBITAAAAAOSA4kywtpw1UbJExz1jz-j0EAyp&response=".$captcha);        
+                $response = json_decode($response, true);
+                if ($response["success"]==false) {
+                    StatusMessage::add('No entry for spammers, sorry','danger');
+                    $f3->reroute('/');
+                }
+            }
 			extract($this->request->data);
 			$check = $this->Model->Users->fetch(array('username' => $username));
 			if (!empty($check)) {
@@ -142,6 +162,7 @@ class User extends Controller {
 		$f3->set('u',$u);
 	}
 
+/*
 	// application logic disabled this function
 	public function promote($f3) {
 		$id = $this->Auth->user('id');
@@ -150,6 +171,7 @@ class User extends Controller {
 		$u->save();
 		return $f3->reroute('/');
 	}
+*/
 
 }
 ?>

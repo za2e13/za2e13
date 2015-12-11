@@ -11,6 +11,7 @@ class User extends AdminController {
 
 	public function edit($f3) {	
 		$id = $f3->get('PARAMS.3');
+		$id = (int)$id;
 		$u = $this->Model->Users->fetch($id);
 		if($this->request->is('post')) {
 			$u->copyfrom('POST');

@@ -18,6 +18,9 @@
 			if($this->request->is('post')) {
 				$category = $this->Model->Categories;
 				$category->title = $this->request->data['title'];
+				
+				// prevent aganist XSS
+				$category->title = htmlspecialchars($category->title);
 				$category->save();
 
 				\StatusMessage::add('Category added succesfully','success');
@@ -40,7 +43,13 @@
 
 		public function edit($f3) {
 			$categoryid = $f3->get('PARAMS.3');
+			
+			// get the ID of the category and if that empty return back to same page!
 			$category = $this->Model->Categories->fetchById($categoryid);
+			if(empty($category)){
+                \StatusMessage::add('Invalid post','danger');
+                return $f3->reroute('/admin/category');
+            }
 			if($this->request->is('post')) {
 				$category->title = $this->request->data['title'];
 				$category->save();

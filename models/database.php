@@ -17,8 +17,8 @@ class Database {
 	}
 
 	/** Perform a direct database query */
-	public function query($sql) {
-		$result = $this->connection->exec($sql);
+	public function query($sql, $parameter) {
+		$result = $this->connection->exec($sql, $parameter);
 		return $result;
 	}
 

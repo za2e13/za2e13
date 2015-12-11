@@ -4,6 +4,8 @@ class Blog extends Controller {
 	public function index($f3) {	
 		if ($f3->exists('PARAMS.3')) {
 			$categoryid = $f3->get('PARAMS.3');
+			// filter the parameter to make sure the id is number not a text 
+			$categoryid=(integer)$categoryid;
 			$category = $this->Model->Categories->fetch($categoryid);
 			$postlist = array_values($this->Model->Post_Categories->fetchList(array('id','post_id'),array('category_id' => $categoryid)));
 			$posts = $this->Model->Posts->fetchAll(array('id' => $postlist, 'published' => 'IS NOT NULL'),array('order' => 'published DESC'));
@@ -19,6 +21,8 @@ class Blog extends Controller {
 
 	public function view($f3) {
 		$id = $f3->get('PARAMS.3');
+		
+		// Provent SQL Injection by filtering data
 		$id= (integer)$id;
 		if(empty($id)) {
 			return $f3->reroute('/');
@@ -40,7 +44,7 @@ class Blog extends Controller {
 
 	public function reset($f3) {
 		
-		// check user access 
+		// check user access level
 		$access = $this->Auth->user("level");
 		
 		if($access<2){
@@ -117,7 +121,9 @@ class Blog extends Controller {
 
 			//Get search results
 			$search = str_replace("*","%",$search); //Allow * as wildcard
-			$ids = $this->db->connection->exec("SELECT id FROM `posts` WHERE `title` LIKE \"%$search%\" OR `content` LIKE '%$search%'");
+			// get rid of the tags 
+			$search = $f3->clean($search);
+			$ids = $this->db->connection->exec("SELECT id FROM `posts` WHERE `title` LIKE '%' :thehead '%' OR `content` LIKE '%' :thebody '%'", array('thehead'=>$search, 'thebody'=>$search));
 			$ids = Hash::extract($ids,'{n}.id');
 			if(empty($ids)) {
 				StatusMessage::add('No search results found for ' . $search); 

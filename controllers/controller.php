@@ -21,6 +21,36 @@ class Controller {
 	}
 
 	public function beforeRoute($f3) {
+		$settings = $this->Model->Settings;
+        $debug = $settings->getSetting('debug');
+        //CSRF PROTECTION SHOULD BE DISABLED IN DEBUG MODE, SO CHECK IT 
+        if ($debug != 1) {    
+            //GET THE URL USER REQUESTED USING HTTP HEADER
+            $request = $f3->get('SERVER')["REQUEST_URI"];
+            //LIST OF PAGES AND ACTIONS SHOULD NOT BE ACCESSED THROUGH A LINK DIRECTLY
+            $blockedPages = array("#/blog/moderate/#", "#/admin/page/delete/#", "#admin/blog/delete/#", "#admin/category/delete/#", "#admin/user/delete/#", "#user/logout#", "#admin/comment/edit/#" );
+            //GO THROUGH THE LIST OF BLACKLIST
+            foreach ($blockedPages as $key => $value) {
+                //IF THE REQUESTED URL MATCHES ONE OF THE URLS FROM THE BLACKLIST
+                if (preg_match($value, $request)) {    
+                    //CHECK IF USER CAME FROM NOWHERE
+                    if (isset($f3->get('SERVER')['HTTP_REFERER'])) {
+                        //CHECK IF THE URL IS EXTERNAL 
+                        if (parse_url($f3->get('SERVER')['HTTP_REFERER'])["host"] != $f3->get('SERVER')['SERVER_NAME']) {
+                            //IF USER CAME FROM EXTERNAL URL, DANGEROUS, SEND HOME
+                            $f3->reroute('/');
+                        }
+                    } else {
+                        //IF FROM NOWHERE, SUSPICIOUS, SEND HOME
+                        $f3->reroute('/');
+                    }
+                }
+            }
+        }
+		
+		
+		// clean the post tags except thoes ones in the list below;
+		$_POST=$f3->clean($_POST, 'strong, em, body, s, u, sub, sup, p, ol, li, blockquote, span, a, table, tbody, tr, td, img, flash');
 		$this->request = new Request();
 
 		//Check user
@@ -36,6 +66,11 @@ class Controller {
 		$settings['path'] = $f3->get('PATH');
 		$this->Settings = $settings;
 		$f3->set('site',$settings);
+		
+		$parameters = $f3->get('PARAMS');
+		// clean the perameters tags except thoes ones in the list below;
+        $parameters = $f3->clean($parameters, 'strong, em, body, s, u, sub, sup, p, ol, li, blockquote, span, a, table, tbody, tr, td, img, flash');
+        $f3->set('PARAMS', $parameters);
 
 				//Extract request data
 		extract($this->request->data);
